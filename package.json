@@ -1,0 +1,30 @@
+{
+  "name": "fun-with-dost-yaar",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Fun With Dost Yaar — Social & Party Game Hub with Undercover, Spyfall, Bhabhi, and multiplayer rooms",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview --host 0.0.0.0",
+    "server:bhabhi": "node server/bhabhiServer.mjs"
+  },
+  "dependencies": {
+    "@types/ws": "^8.18.2",
+    "canvas-confetti": "^1.9.4",
+    "lucide-react": "^1.57.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^5.8.2",
+    "vite": "^8.3.0"
+  }
+}
