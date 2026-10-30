@@ -92,3 +92,4 @@ The application features:
 - [ ] Join Bhabhi room &rarr; Dealer Riya introduces the table and deals cards.
 - [ ] Audio & voice &rarr; Web Audio sounds play crisply and microphone test passes.
 - [ ] Mobile &rarr; Landscape lock prompt triggers if rotated vertically.
+

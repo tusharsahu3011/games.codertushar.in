@@ -805,4 +805,26 @@ input:focus, select:focus {
   animation: cardDealFlip 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Thoko Penalty Dramatic Banner Animation */
+@keyframes thokoBannerDrop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) translateY(-40px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.thoko-banner {
+  animation: thokoBannerDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.75), 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+
 

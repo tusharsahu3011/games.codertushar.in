@@ -369,25 +369,30 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
         >
           {/* Lead Suit / Review Status Header */}
           <div
+            className={
+              isHoldingCompletedTrick && gameState.lastCompletedTrick?.reason === 'thoko'
+                ? 'thoko-banner'
+                : ''
+            }
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
               background: isHoldingCompletedTrick
-                ? (gameState.lastCompletedTrick?.reason === 'thoko' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(245, 158, 11, 0.9)')
+                ? (gameState.lastCompletedTrick?.reason === 'thoko' ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : 'linear-gradient(135deg, #f59e0b, #d97706)')
                 : 'rgba(15, 23, 42, 0.85)',
               border: isHoldingCompletedTrick
-                ? '1px solid #ffffff'
+                ? '2px solid #ffffff'
                 : '1px solid rgba(255, 255, 255, 0.15)',
-              padding: '6px 18px',
+              padding: '7px 22px',
               borderRadius: '999px',
               marginBottom: '16px',
               boxShadow: isHoldingCompletedTrick
-                ? '0 0 20px rgba(245, 158, 11, 0.5)'
+                ? '0 0 24px rgba(245, 158, 11, 0.6)'
                 : '0 4px 12px rgba(0, 0, 0, 0.35)',
               color: '#ffffff',
               fontWeight: 800,
-              fontSize: '0.84rem',
+              fontSize: '0.86rem',
               transition: 'all 0.2s ease',
             }}
           >
