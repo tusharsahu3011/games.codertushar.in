@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview --host 0.0.0.0",
-    "server:bhabhi": "node server/bhabhiServer.mjs"
+    "server:bhabhi": "node server/bhabhiServer.mjs",
+    "start": "node server/bhabhiServer.mjs"
   },
   "dependencies": {
     "@types/ws": "^8.18.2",

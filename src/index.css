@@ -768,3 +768,41 @@ input:focus, select:focus {
   border-color: rgba(245, 158, 11, 0.6) !important;
 }
 
+/* 3D Card Flip Transitions & Perspective */
+.playing-card-container {
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+.card-3d-flipper {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Dealing 3D flip-in animation */
+@keyframes cardDealFlip {
+  0% {
+    opacity: 0;
+    transform: translateY(-80px) rotateY(180deg) scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-10px) rotateY(20deg) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateY(0deg) scale(1);
+  }
+}
+
+.card-deal-anim {
+  animation: cardDealFlip 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+

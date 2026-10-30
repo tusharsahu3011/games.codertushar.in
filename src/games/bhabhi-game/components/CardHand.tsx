@@ -92,10 +92,11 @@ export default function CardHand({
         flexDirection: 'column',
         alignItems: 'center',
         width: '100%',
-        maxWidth: '1020px',
+        maxWidth: '1200px',
         margin: '0 auto',
-        padding: '0 8px 16px',
+        padding: '0 8px 8px',
         position: 'relative',
+        zIndex: 20,
       }}
     >
       {/* Top Filter Bar & Turn Status */}
@@ -107,7 +108,7 @@ export default function CardHand({
           width: '100%',
           flexWrap: 'wrap',
           gap: '8px',
-          marginBottom: '10px',
+          marginBottom: '8px',
         }}
       >
         {/* Suit Tabs */}
@@ -116,10 +117,11 @@ export default function CardHand({
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            background: 'rgba(15, 23, 42, 0.7)',
+            background: 'rgba(15, 23, 42, 0.85)',
+            backdropFilter: 'blur(8px)',
             padding: '4px',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
           }}
         >
           <button
@@ -156,7 +158,7 @@ export default function CardHand({
                   padding: '4px 9px',
                   borderRadius: '8px',
                   border: isSelected ? `1px solid ${SUIT_COLORS[suit]}` : '1px solid transparent',
-                  background: isSelected ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                  background: isSelected ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
                   color: isSelected ? '#ffffff' : '#94a3b8',
                   fontSize: '0.78rem',
                   fontWeight: 700,
@@ -183,21 +185,23 @@ export default function CardHand({
                 gap: '5px',
                 fontSize: '0.78rem',
                 fontWeight: 800,
-                padding: '4px 10px',
+                padding: '4px 12px',
                 borderRadius: '999px',
-                background: 'rgba(245, 158, 11, 0.2)',
+                background: 'rgba(245, 158, 11, 0.22)',
                 border: '1px solid #f59e0b',
                 color: '#fbbf24',
+                boxShadow: '0 0 14px rgba(245, 158, 11, 0.4)',
+                animation: 'pulse 1.8s infinite',
               }}
             >
-              <Sparkles size={13} />
-              Play Ace of Spades (A♠) to Start!
+              <Sparkles size={14} />
+              Lead with Ace of Spades (A♠)!
             </span>
           )}
 
           <div
             style={{
-              padding: '4px 12px',
+              padding: '5px 14px',
               borderRadius: '999px',
               fontSize: '0.8rem',
               fontWeight: 800,
@@ -205,20 +209,21 @@ export default function CardHand({
               background: isTrickReviewing
                 ? 'rgba(245, 158, 11, 0.2)'
                 : isMyTurn
-                ? 'rgba(16, 185, 129, 0.2)'
-                : 'rgba(255, 255, 255, 0.05)',
+                ? 'rgba(16, 185, 129, 0.25)'
+                : 'rgba(255, 255, 255, 0.06)',
               border: isTrickReviewing
                 ? '1px solid rgba(245, 158, 11, 0.5)'
                 : isMyTurn
-                ? '1px solid rgba(16, 185, 129, 0.5)'
-                : '1px solid rgba(255, 255, 255, 0.1)',
+                ? '1px solid rgba(16, 185, 129, 0.6)'
+                : '1px solid rgba(255, 255, 255, 0.12)',
               color: isTrickReviewing ? '#fbbf24' : isMyTurn ? '#34d399' : '#94a3b8',
+              boxShadow: isMyTurn ? '0 0 16px rgba(16, 185, 129, 0.35)' : 'none',
             }}
           >
             {isTrickReviewing
               ? '⏳ REVIEWING TRICK (2s)...'
               : isMyTurn
-              ? '● YOUR TURN — SELECT A CARD'
+              ? '● YOUR TURN — CLICK A CARD TO PLAY'
               : 'WAITING FOR OPPONENT...'}
           </div>
         </div>
@@ -231,14 +236,14 @@ export default function CardHand({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(239, 68, 68, 0.18)',
-            border: '1px solid rgba(239, 68, 68, 0.45)',
+            background: 'rgba(239, 68, 68, 0.22)',
+            border: '1px solid rgba(239, 68, 68, 0.5)',
             color: '#fca5a5',
-            padding: '6px 14px',
+            padding: '6px 16px',
             borderRadius: '10px',
             fontSize: '0.82rem',
-            fontWeight: 600,
-            marginBottom: '10px',
+            fontWeight: 700,
+            marginBottom: '8px',
             width: '100%',
             justifyContent: 'center',
             animation: 'fadeIn 0.2s ease',
@@ -249,19 +254,24 @@ export default function CardHand({
         </div>
       )}
 
-      {/* Cards Display Tray (Overlapping Radial Semi-Circle Arc Fan) */}
+      {/* ================= CARDS DOCK (PERFECT HORIZONTAL STRAIGHT LINE) ================= */}
       <div
-        className="cards-tray"
+        className="cards-dock-container"
         style={{
+          width: '100%',
+          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(10, 15, 28, 0.8) 100%)',
+          border: '1.5px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '20px',
+          boxShadow: 'inset 0 2px 12px rgba(255, 255, 255, 0.05), 0 12px 32px rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(12px)',
+          padding: '26px 16px 14px',
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-          width: '100%',
           overflowX: 'auto',
           overflowY: 'visible',
-          padding: '28px 16px 14px',
-          minHeight: '175px',
           WebkitOverflowScrolling: 'touch',
+          minHeight: '168px',
         }}
       >
         {filteredHand.length === 0 ? (
@@ -276,16 +286,23 @@ export default function CardHand({
               fontSize: '0.9rem',
             }}
           >
-            <Sparkles size={24} color="#34d399" style={{ marginBottom: '8px' }} />
-            <span>🎉 You have Got Away! Safe from being Bhabhi!</span>
+            <Sparkles size={26} color="#34d399" style={{ marginBottom: '8px' }} />
+            <span style={{ fontWeight: 800, color: '#34d399', fontSize: '1rem' }}>
+              🎉 You have Got Away!
+            </span>
+            <span style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '2px' }}>
+              Hand is cleared! Safe from becoming Bhabhi.
+            </span>
           </div>
         ) : (
           <div
+            className="horizontal-straight-cards-row"
             style={{
               display: 'flex',
+              flexDirection: 'row',
               alignItems: 'flex-end',
               justifyContent: 'center',
-              paddingBottom: '6px',
+              paddingBottom: '2px',
             }}
           >
             {filteredHand.map((card, idx) => {
@@ -294,25 +311,24 @@ export default function CardHand({
               const isSelected = selectedCardId === card.id;
               const isHovered = hoveredCardId === card.id;
 
-              // Arc Fan Radial Semi-Circle Geometry
               const N = filteredHand.length;
-              const centerIdx = (N - 1) / 2;
-              const offset = idx - centerIdx;
 
-              // Angular spread per card around imaginary pivot
-              const totalArcSpread = Math.min(68, Math.max(16, (N - 1) * (N > 10 ? 4.8 : N > 6 ? 5.8 : 7.5)));
-              const angleStep = N > 1 ? totalArcSpread / (N - 1) : 0;
-              const rotationDeg = offset * angleStep;
+              // Horizontal overlap calculation to fit cleanly in viewport
+              const overlapMargin = N > 14
+                ? '-52px'
+                : N > 11
+                ? '-42px'
+                : N > 8
+                ? '-34px'
+                : N > 5
+                ? '-24px'
+                : N > 2
+                ? '-14px'
+                : '0px';
 
-              // Parabolic vertical droop (creates the realistic natural arch)
-              const arcY = Math.pow(Math.abs(offset), 1.55) * (N > 10 ? 1.7 : 2.4);
-
-              // Lift card gracefully on hover or active selection
-              const liftY = isSelected ? -28 : isHovered ? -16 : 0;
-              const scaleFactor = isSelected ? 1.08 : isHovered ? 1.05 : 1;
-
-              // Overlapping negative margin
-              const overlapMargin = N > 12 ? '-38px' : N > 8 ? '-30px' : N > 5 ? '-20px' : N > 2 ? '-10px' : '0px';
+              // Vertical lift on hover or selection (keeping strictly 0deg horizontal rotation)
+              const liftY = isSelected ? -24 : isHovered ? -16 : 0;
+              const scaleFactor = isSelected ? 1.06 : isHovered ? 1.03 : 1;
 
               return (
                 <div
@@ -321,8 +337,7 @@ export default function CardHand({
                     marginLeft: idx === 0 ? 0 : overlapMargin,
                     zIndex: isSelected ? 60 : isHovered ? 50 : idx + 10,
                     position: 'relative',
-                    transform: `translateY(${arcY + liftY}px) rotate(${rotationDeg}deg) scale(${scaleFactor})`,
-                    transformOrigin: '50% 135%',
+                    transform: `translateY(${liftY}px) scale(${scaleFactor})`,
                     transition: 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.15s ease',
                   }}
                   onMouseEnter={() => {
@@ -335,15 +350,12 @@ export default function CardHand({
                 >
                   <PlayingCard
                     card={card}
-                    size="md"
+                    size="lg"
                     isSelected={isSelected}
                     isValidMove={isValid}
                     disabled={!isMyTurn}
                     highlightLeadAce={isAceOfSpadesFirstMove}
                     onClick={() => handleCardClick(card)}
-                    style={{
-                      transform: 'none', // Handled by outer radial arc wrapper
-                    }}
                   />
                 </div>
               );
@@ -352,19 +364,20 @@ export default function CardHand({
         )}
       </div>
 
-      {/* Helpful bottom status */}
+      {/* Helpful bottom cue */}
       <div
         style={{
-          fontSize: '0.74rem',
+          fontSize: '0.75rem',
           color: '#64748b',
-          marginTop: '4px',
+          marginTop: '6px',
+          fontWeight: 600,
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
         }}
       >
         <ArrowUpCircle size={13} color="#94a3b8" />
-        <span>Click any highlighted card to play it to the center trick.</span>
+        <span>Click card to play into the center table trick</span>
       </div>
     </div>
   );

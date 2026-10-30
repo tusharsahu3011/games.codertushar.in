@@ -9,7 +9,7 @@ export interface PlayingCardProps {
   isValidMove?: boolean;
   disabled?: boolean;
   onClick?: () => void;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   rotation?: number;
   highlightLeadAce?: boolean;
   playerName?: string;
@@ -31,70 +31,26 @@ export default function PlayingCard({
   className = '',
   style,
 }: PlayingCardProps) {
-  const isAceOfSpades = card && card.suit === 'SPADES' && card.rank === 14;
+  const isAceOfSpades = Boolean(card && card.suit === 'SPADES' && card.rank === 14);
 
-  // Size dimensions
+  // Enlarged dimensions for premium board presence
   const dimensions = {
-    sm: { width: '48px', height: '68px', fontSize: '0.8rem', suitSize: '1.2rem', radius: '8px' },
-    md: { width: '68px', height: '98px', fontSize: '1rem', suitSize: '1.7rem', radius: '10px' },
-    lg: { width: '88px', height: '128px', fontSize: '1.25rem', suitSize: '2.2rem', radius: '12px' },
+    sm: { width: '54px', height: '80px', fontSize: '0.85rem', suitSize: '1.35rem', radius: '8px' },
+    md: { width: '78px', height: '114px', fontSize: '1.1rem', suitSize: '2.0rem', radius: '11px' },
+    lg: { width: '96px', height: '140px', fontSize: '1.35rem', suitSize: '2.6rem', radius: '13px' },
+    xl: { width: '112px', height: '162px', fontSize: '1.55rem', suitSize: '3.1rem', radius: '15px' },
   }[size];
 
-  if (isFaceDown || !card) {
-    return (
-      <div
-        className={`playing-card face-down ${className}`}
-        style={{
-          width: dimensions.width,
-          minWidth: dimensions.width,
-          maxWidth: dimensions.width,
-          height: dimensions.height,
-          minHeight: dimensions.height,
-          maxHeight: dimensions.height,
-          borderRadius: dimensions.radius,
-          background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)',
-          border: '1.5px solid rgba(165, 180, 252, 0.3)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.45)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transform: `rotate(${rotation}deg)`,
-          position: 'relative',
-          userSelect: 'none',
-          cursor: disabled ? 'not-allowed' : 'default',
-          flexShrink: 0,
-          ...style,
-        }}
-      >
-        <div
-          style={{
-            width: 'calc(100% - 10px)',
-            height: 'calc(100% - 10px)',
-            borderRadius: '6px',
-            border: '1px dashed rgba(165, 180, 252, 0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%)',
-          }}
-        >
-          <span style={{ fontSize: '1.1rem', color: '#818cf8', opacity: 0.8 }}>♠</span>
-        </div>
-      </div>
-    );
-  }
-
-  const isRed = card.suit === 'HEARTS' || card.suit === 'DIAMONDS';
-  const rankLabel = getRankLabel(card.rank);
-  const suitSymbol = SUIT_SYMBOLS[card.suit];
-  const suitColor = isRed ? '#ef4444' : '#0f172a';
-
   const isClickable = !disabled && Boolean(onClick);
+  const isRed = card ? card.suit === 'HEARTS' || card.suit === 'DIAMONDS' : false;
+  const rankLabel = card ? getRankLabel(card.rank) : '';
+  const suitSymbol = card ? SUIT_SYMBOLS[card.suit] : '';
+  const suitColor = isRed ? '#dc2626' : '#0f172a';
 
   return (
     <div
-      onClick={isClickable ? onClick : undefined}
-      className={`playing-card face-up ${isSelected ? 'selected' : ''} ${className}`}
+      className={`playing-card-container ${className}`}
+      onClick={isClickable && (!card || isValidMove) ? onClick : undefined}
       style={{
         width: dimensions.width,
         minWidth: dimensions.width,
@@ -102,141 +58,264 @@ export default function PlayingCard({
         height: dimensions.height,
         minHeight: dimensions.height,
         maxHeight: dimensions.height,
-        borderRadius: dimensions.radius,
-        background: isAceOfSpades && highlightLeadAce
-          ? 'linear-gradient(145deg, #fffbeb 0%, #fef3c7 60%, #fde68a 100%)'
-          : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-        border: isAceOfSpades && highlightLeadAce
-          ? '2px solid #f59e0b'
-          : isSelected
-          ? '2px solid #38bdf8'
-          : '1px solid rgba(0, 0, 0, 0.15)',
-        boxShadow: isAceOfSpades && highlightLeadAce
-          ? '0 0 16px rgba(245, 158, 11, 0.6), 0 6px 16px rgba(0,0,0,0.4)'
-          : isSelected
-          ? '0 0 14px rgba(56, 189, 248, 0.6), 0 8px 18px rgba(0,0,0,0.35)'
-          : isValidMove && !disabled
-          ? '0 4px 10px rgba(0, 0, 0, 0.25)'
-          : '0 2px 6px rgba(0, 0, 0, 0.15)',
-        opacity: !isValidMove && !disabled ? 0.9 : 1,
-        filter: !isValidMove && !disabled ? 'brightness(0.92)' : 'none',
-        transform: isSelected
-          ? `translateY(-14px) rotate(${rotation}deg) scale(1.04)`
-          : `rotate(${rotation}deg)`,
-        transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, opacity 0.18s ease',
-        cursor: isClickable && isValidMove ? 'pointer' : 'default',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: size === 'sm' ? '3px 4px' : '5px 7px',
-        userSelect: 'none',
+        perspective: '1000px',
         position: 'relative',
+        userSelect: 'none',
         flexShrink: 0,
+        cursor: isClickable && isValidMove ? 'pointer' : 'default',
+        transform: `rotate(${rotation}deg)`,
+        transition: 'transform 0.24s cubic-bezier(0.16, 1, 0.3, 1)',
         ...style,
       }}
     >
-      {/* Top Left Corner */}
+      {/* 3D Flipper Core */}
       <div
+        className="card-3d-flipper"
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          lineHeight: 1,
-          color: suitColor,
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          transformStyle: 'preserve-3d',
+          transition: 'transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.25s ease',
+          transform: isFaceDown || !card
+            ? 'rotateY(180deg)'
+            : isSelected
+            ? 'translateY(-18px) scale(1.05)'
+            : 'translateY(0)',
+          borderRadius: dimensions.radius,
+          boxShadow: isAceOfSpades && highlightLeadAce
+            ? '0 0 20px rgba(245, 158, 11, 0.75), 0 10px 24px rgba(0, 0, 0, 0.6)'
+            : isSelected
+            ? '0 0 18px rgba(56, 189, 248, 0.7), 0 12px 24px rgba(0, 0, 0, 0.55)'
+            : isValidMove && !disabled
+            ? '0 6px 16px rgba(0, 0, 0, 0.45)'
+            : '0 3px 8px rgba(0, 0, 0, 0.3)',
         }}
       >
-        <span style={{ fontWeight: 800, fontSize: dimensions.fontSize, letterSpacing: '-0.02em' }}>
-          {rankLabel}
-        </span>
-        <span style={{ fontSize: size === 'sm' ? '0.75rem' : '0.95rem', marginTop: '1px' }}>
-          {suitSymbol}
-        </span>
-      </div>
-
-      {/* Center Watermark / Emblem */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          fontSize: dimensions.suitSize,
-          color: suitColor,
-          opacity: card.rank >= 11 ? 0.7 : 0.95,
-          pointerEvents: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {card.rank >= 11 && (
-          <span style={{ fontSize: '0.65em', fontWeight: 900, marginBottom: '-4px' }}>
-            {rankLabel}
-          </span>
-        )}
-        <span>{suitSymbol}</span>
-      </div>
-
-      {/* Special Lead Badge on Ace of Spades */}
-      {isAceOfSpades && highlightLeadAce && (
+        {/* ================= FRONT FACE ================= */}
         <div
+          className="card-face card-front"
           style={{
             position: 'absolute',
-            top: '-8px',
-            right: '-8px',
-            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-            color: '#ffffff',
-            fontSize: '0.62rem',
-            fontWeight: 900,
-            padding: '2px 6px',
-            borderRadius: '999px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
-            letterSpacing: '0.04em',
-            zIndex: 10,
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            borderRadius: dimensions.radius,
+            background: isAceOfSpades && highlightLeadAce
+              ? 'linear-gradient(145deg, #fffbeb 0%, #fef3c7 65%, #fde68a 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f9fafb 55%, #f3f4f6 100%)',
+            border: isAceOfSpades && highlightLeadAce
+              ? '2px solid #f59e0b'
+              : isSelected
+              ? '2px solid #38bdf8'
+              : '1px solid rgba(0, 0, 0, 0.18)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            padding: size === 'sm' ? '4px 5px' : '6px 8px',
+            overflow: 'hidden',
           }}
         >
-          LEAD ⭐
-        </div>
-      )}
+          {/* Subtle inner linen border */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: '3px',
+              borderRadius: `calc(${dimensions.radius} - 2px)`,
+              border: '1px solid rgba(0, 0, 0, 0.04)',
+              pointerEvents: 'none',
+            }}
+          />
 
-      {/* Bottom Right Corner (Inverted) */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          lineHeight: 1,
-          color: suitColor,
-          transform: 'rotate(180deg)',
-        }}
-      >
-        <span style={{ fontWeight: 800, fontSize: dimensions.fontSize, letterSpacing: '-0.02em' }}>
-          {rankLabel}
-        </span>
-        <span style={{ fontSize: size === 'sm' ? '0.75rem' : '0.95rem', marginTop: '1px' }}>
-          {suitSymbol}
-        </span>
+          {/* Top Left Pip & Rank */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              lineHeight: 1,
+              color: suitColor,
+              zIndex: 2,
+            }}
+          >
+            <span
+              style={{
+                fontWeight: 900,
+                fontSize: dimensions.fontSize,
+                letterSpacing: '-0.03em',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+              }}
+            >
+              {rankLabel}
+            </span>
+            <span style={{ fontSize: `calc(${dimensions.fontSize} * 0.9)`, marginTop: '1px' }}>
+              {suitSymbol}
+            </span>
+          </div>
+
+          {/* Center Royal Watermark & Seal */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: dimensions.suitSize,
+              color: suitColor,
+              opacity: card && card.rank >= 11 ? 0.8 : 0.95,
+              pointerEvents: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1,
+            }}
+          >
+            {card && card.rank >= 11 && (
+              <span
+                style={{
+                  fontSize: '0.62em',
+                  fontWeight: 900,
+                  marginBottom: '-4px',
+                  letterSpacing: '0.04em',
+                  color: isRed ? '#b91c1c' : '#1e293b',
+                }}
+              >
+                {rankLabel}
+              </span>
+            )}
+            <span>{suitSymbol}</span>
+          </div>
+
+          {/* Special Lead Badge for Ace of Spades */}
+          {isAceOfSpades && highlightLeadAce && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '-7px',
+                right: '-7px',
+                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                color: '#ffffff',
+                fontSize: '0.62rem',
+                fontWeight: 900,
+                padding: '2px 7px',
+                borderRadius: '999px',
+                boxShadow: '0 3px 8px rgba(0,0,0,0.5)',
+                letterSpacing: '0.04em',
+                zIndex: 10,
+              }}
+            >
+              LEAD ⭐
+            </div>
+          )}
+
+          {/* Bottom Right Corner (Inverted) */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              lineHeight: 1,
+              color: suitColor,
+              transform: 'rotate(180deg)',
+              zIndex: 2,
+            }}
+          >
+            <span
+              style={{
+                fontWeight: 900,
+                fontSize: dimensions.fontSize,
+                letterSpacing: '-0.03em',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+              }}
+            >
+              {rankLabel}
+            </span>
+            <span style={{ fontSize: `calc(${dimensions.fontSize} * 0.9)`, marginTop: '1px' }}>
+              {suitSymbol}
+            </span>
+          </div>
+        </div>
+
+        {/* ================= BACK FACE (PREMIUM CASINO FILIGREE) ================= */}
+        <div
+          className="card-face card-back"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            borderRadius: dimensions.radius,
+            background: 'linear-gradient(145deg, #091322 0%, #0f1d33 50%, #050b14 100%)',
+            border: '2px solid #b45309',
+            boxShadow: 'inset 0 0 16px rgba(0, 0, 0, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '5px',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Intricate Gold Foil Outer Border */}
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: `calc(${dimensions.radius} - 4px)`,
+              border: '1.5px solid rgba(245, 158, 11, 0.55)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              background: `
+                radial-gradient(circle at center, rgba(245, 158, 11, 0.15) 0%, transparent 70%),
+                repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.08) 0px, rgba(245, 158, 11, 0.08) 2px, transparent 2px, transparent 8px),
+                repeating-linear-gradient(-45deg, rgba(245, 158, 11, 0.08) 0px, rgba(245, 158, 11, 0.08) 2px, transparent 2px, transparent 8px)
+              `,
+            }}
+          >
+            {/* Center Royal Medallion */}
+            <div
+              style={{
+                width: size === 'sm' ? '28px' : '42px',
+                height: size === 'sm' ? '28px' : '42px',
+                borderRadius: '50%',
+                border: '1.5px solid rgba(245, 158, 11, 0.8)',
+                background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                boxShadow: '0 0 12px rgba(245, 158, 11, 0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#f59e0b',
+                fontSize: size === 'sm' ? '1rem' : '1.35rem',
+              }}
+            >
+              ♠
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Player name label when card is played on table */}
+      {/* Player name label when card is played onto the table */}
       {playerName && (
         <div
           style={{
             position: 'absolute',
-            bottom: '-22px',
+            bottom: '-24px',
             left: '50%',
             transform: 'translateX(-50%)',
-            background: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            background: 'rgba(15, 23, 42, 0.92)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
             color: '#f8fafc',
-            fontSize: '0.68rem',
-            fontWeight: 700,
-            padding: '1px 7px',
-            borderRadius: '6px',
+            fontSize: '0.72rem',
+            fontWeight: 800,
+            padding: '2px 8px',
+            borderRadius: '999px',
             whiteSpace: 'nowrap',
             pointerEvents: 'none',
-            zIndex: 5,
+            zIndex: 10,
           }}
         >
           {playerName}

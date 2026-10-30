@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import InGameChat from '../../components/common/InGameChat';
 import GameSettingsModal from '../../components/common/GameSettingsModal';
+import LandscapeOrientationLock from '../../components/common/LandscapeOrientationLock';
 
 export interface BhabhiAppProps {
   initialMode?: 'mode_select' | 'solo' | 'online';
@@ -50,6 +51,8 @@ export default function BhabhiApp({
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const prevChatCountRef = useRef(0);
   const [isMuted, setIsMuted] = useState(bhabhiSounds.isMuted());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [voiceState, setVoiceState] = useState<VoiceSnapshot>({
@@ -79,7 +82,14 @@ export default function BhabhiApp({
     return () => unsubVoice();
   }, []);
 
-  // Show dynamic toast banner
+  // Track unread in-game chat messages
+  useEffect(() => {
+    const currentCount = snapshot.room?.chatMessages?.length || 0;
+    if (!isChatOpen && currentCount > prevChatCountRef.current) {
+      setUnreadChatCount((prev) => prev + (currentCount - prevChatCountRef.current));
+    }
+    prevChatCountRef.current = currentCount;
+  }, [snapshot.room?.chatMessages?.length, isChatOpen]);
   const triggerToast = useCallback((msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -223,16 +233,27 @@ export default function BhabhiApp({
     prevMyTurnRef.current = isMyTurn;
   }, [isMyTurn]);
 
+  const isPlaying = view === 'active_game' && Boolean(room && room.status === GameStatus.IN_PROGRESS);
+
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'radial-gradient(ellipse at 50% 0%, #06241a 0%, #030712 70%)',
-        color: '#f8fafc',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <LandscapeOrientationLock gameTitle="Bhabhi (Get Away)">
+      <div
+        style={{
+          minHeight: '100vh',
+          height: isPlaying ? '100vh' : 'auto',
+          width: isPlaying ? '100vw' : 'auto',
+          position: isPlaying ? 'fixed' : 'relative',
+          inset: isPlaying ? 0 : undefined,
+          overflow: isPlaying ? 'hidden' : 'auto',
+          background: isPlaying
+            ? 'radial-gradient(ellipse at 50% 25%, #064e3b 0%, #022c22 45%, #021a14 85%, #010f0b 100%)'
+            : 'radial-gradient(ellipse at 50% 0%, #06241a 0%, #030712 70%)',
+          color: '#f8fafc',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: isPlaying ? 'inset 0 0 100px rgba(0, 0, 0, 0.95)' : 'none',
+        }}
+      >
       {/* TOP UTILITY HEADER */}
       <header
         style={{
@@ -390,7 +411,10 @@ export default function BhabhiApp({
           {room && (
             <button
               type="button"
-              onClick={() => setIsChatOpen(true)}
+              onClick={() => {
+                setIsChatOpen(true);
+                setUnreadChatCount(0);
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -403,11 +427,35 @@ export default function BhabhiApp({
                 fontSize: '0.78rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                position: 'relative',
               }}
               title="Open In-Room Text Chat"
             >
               <MessageSquare size={14} />
               <span>Chat ({room.chatMessages?.length || 0})</span>
+              {unreadChatCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-6px',
+                    right: '-6px',
+                    background: '#ef4444',
+                    color: '#ffffff',
+                    fontSize: '0.62rem',
+                    fontWeight: 900,
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.7)',
+                    animation: 'bounce 0.8s ease',
+                  }}
+                >
+                  {unreadChatCount}
+                </span>
+              )}
             </button>
           )}
 
@@ -493,7 +541,9 @@ export default function BhabhiApp({
               justifyContent: 'space-between',
               flex: 1,
               width: '100%',
-              padding: '12px 12px 16px',
+              height: 'calc(100vh - 56px)',
+              padding: '4px 10px 8px',
+              overflow: 'hidden',
             }}
           >
             {/* The Poker Card Table (Opponents + Center Trick + Logs) */}
@@ -548,5 +598,6 @@ export default function BhabhiApp({
         accentColor="#10b981"
       />
     </div>
+  </LandscapeOrientationLock>
   );
 }

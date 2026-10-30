@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { GameState, Player, Suit } from '../types';
 import { SUIT_SYMBOLS, SUIT_COLORS } from '../utils/engine';
 import PlayingCard from './PlayingCard';
+import DealerStation from './DealerStation';
+import { webrtcVoice } from '../../undercover-game/utils/webrtcVoice';
 import {
   Users,
   History,
@@ -10,6 +12,7 @@ import {
   Crown,
   ChevronDown,
   ChevronUp,
+  Mic,
 } from 'lucide-react';
 
 export interface BhabhiTableProps {
@@ -20,6 +23,20 @@ export interface BhabhiTableProps {
 export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps) {
   const [showLogDrawer, setShowLogDrawer] = useState(false);
   const [, setTick] = useState(0);
+  const [voiceState, setVoiceState] = useState(() => ({
+    peerStates: webrtcVoice.peerStates,
+    isSpeaking: webrtcVoice.isSpeaking,
+  }));
+
+  useEffect(() => {
+    const unsub = webrtcVoice.subscribe((s) => {
+      setVoiceState({
+        peerStates: s.peerStates,
+        isSpeaking: s.isSpeaking,
+      });
+    });
+    return () => unsub();
+  }, []);
 
   const { activeTrick, currentTurnPlayerId, discardPile, loserId, logs, lastAction } = gameState;
 
@@ -68,9 +85,10 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
         flexDirection: 'column',
         alignItems: 'center',
         width: '100%',
-        maxWidth: '1080px',
+        maxWidth: '1280px',
         margin: '0 auto',
         position: 'relative',
+        flex: 1,
       }}
     >
       {/* Top Banner / Last Action Toast */}
@@ -84,12 +102,12 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
             background: 'rgba(15, 23, 42, 0.85)',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
-            padding: '6px 16px',
+            padding: '5px 16px',
             borderRadius: '999px',
-            fontSize: '0.82rem',
+            fontSize: '0.8rem',
             fontWeight: 700,
             color: '#f8fafc',
-            marginBottom: '12px',
+            marginBottom: '8px',
             backdropFilter: 'blur(8px)',
             maxWidth: '90%',
             textAlign: 'center',
@@ -105,13 +123,14 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
         className="bhabhi-table-surface"
         style={{
           width: '100%',
-          minHeight: 'clamp(500px, 64vh, 660px)',
+          flex: 1,
+          minHeight: 'clamp(420px, 54vh, 620px)',
           background: 'radial-gradient(ellipse at center, #064e3b 0%, #022c22 65%, #021a14 100%)',
-          borderRadius: 'clamp(24px, 4.5vw, 48px)',
+          borderRadius: 'clamp(20px, 4vw, 44px)',
           border: 'clamp(4px, 1.2vw, 8px) solid #27272a',
           boxShadow: 'inset 0 0 90px rgba(0, 0, 0, 0.85), 0 16px 40px rgba(0, 0, 0, 0.65)',
           position: 'relative',
-          padding: 'clamp(18px, 3vw, 32px) clamp(12px, 2.5vw, 24px)',
+          padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 20px) 8px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -133,6 +152,9 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
           }}
         />
 
+        {/* AI DEALER PERSONA (RIYA) */}
+        <DealerStation gameState={gameState} myPlayerId={myPlayerId} />
+
         {/* OPPONENTS AREA (Top Arc) */}
         <div
           style={{
@@ -148,6 +170,7 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
           {opponents.map((opponent) => {
             const isTurn = currentTurnPlayerId === opponent.id;
             const isLoser = loserId === opponent.id;
+            const isSpeaking = Boolean(voiceState.peerStates[opponent.id]?.isSpeaking);
             const cardCount = opponent.handCount ?? opponent.hand.length;
 
             return (
@@ -162,10 +185,14 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
                     : 'rgba(15, 23, 42, 0.75)',
                   border: isLoser
                     ? '2px solid #ef4444'
+                    : isSpeaking
+                    ? '2.5px solid #10b981'
                     : isTurn
                     ? '2px solid #10b981'
                     : '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: isTurn
+                  boxShadow: isSpeaking
+                    ? '0 0 20px rgba(16, 185, 129, 0.75)'
+                    : isTurn
                     ? '0 0 18px rgba(16, 185, 129, 0.45)'
                     : '0 4px 12px rgba(0, 0, 0, 0.3)',
                   padding: '8px 12px',
@@ -208,9 +235,34 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
                       height: '42px',
                       borderRadius: '50%',
                       background: '#1e293b',
-                      border: isTurn ? '2px solid #34d399' : '1.5px solid rgba(255, 255, 255, 0.2)',
+                      border: isSpeaking
+                        ? '2.5px solid #10b981'
+                        : isTurn
+                        ? '2px solid #34d399'
+                        : '1.5px solid rgba(255, 255, 255, 0.2)',
                     }}
                   />
+                  {isSpeaking && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '-3px',
+                        left: '-3px',
+                        background: '#10b981',
+                        color: '#ffffff',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 0 8px rgba(16, 185, 129, 0.8)',
+                      }}
+                      title="Speaking"
+                    >
+                      <Mic size={10} />
+                    </span>
+                  )}
                   {opponent.isBot && (
                     <span
                       style={{

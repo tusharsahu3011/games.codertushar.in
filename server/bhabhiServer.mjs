@@ -5,6 +5,13 @@
 
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer } from 'http';
+import { existsSync, createReadStream, statSync } from 'fs';
+import { join, extname, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const distDir = join(__dirname, '..', 'dist');
 
 const SUITS = ['SPADES', 'HEARTS', 'CLUBS', 'DIAMONDS'];
 const RANKS = [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -432,8 +439,72 @@ class BhabhiEngine {
   }
 }
 
-const PORT = Number(process.env.BHABHI_PORT) || 3001;
-const httpServer = createServer((_req, res) => {
+const PORT = Number(process.env.PORT) || Number(process.env.BHABHI_PORT) || 3001;
+
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.mjs': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+};
+
+const httpServer = createServer((req, res) => {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
+  const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
+  const pathname = decodeURIComponent(url.pathname);
+
+  // Health check
+  if (pathname === '/health' || pathname === '/api/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', time: Date.now(), port: PORT }));
+    return;
+  }
+
+  // Production static file serving if dist exists
+  if (existsSync(distDir)) {
+    let filePath = join(distDir, pathname);
+    try {
+      if (existsSync(filePath) && statSync(filePath).isDirectory()) {
+        filePath = join(filePath, 'index.html');
+      }
+
+      if (existsSync(filePath) && statSync(filePath).isFile()) {
+        const ext = extname(filePath).toLowerCase();
+        const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+        res.writeHead(200, { 'Content-Type': contentType });
+        createReadStream(filePath).pipe(res);
+        return;
+      }
+
+      // SPA fallback
+      const indexPath = join(distDir, 'index.html');
+      if (existsSync(indexPath)) {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        createReadStream(indexPath).pipe(res);
+        return;
+      }
+    } catch (e) {}
+  }
+
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ status: 'Bhabhi WebSocket Server Active', port: PORT }));
 });
