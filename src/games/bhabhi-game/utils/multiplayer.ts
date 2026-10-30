@@ -55,7 +55,17 @@ export class BhabhiMultiplayerEngine {
   }
 
   public getSnapshot(): BhabhiSnapshot {
-    const myPlayer = this.currentRoom?.players.find((p) => p.id === this.myPlayerId) || null;
+    let myPlayer = this.currentRoom?.players.find((p) => p.id === this.myPlayerId) || null;
+    if (!myPlayer && this.currentRoom?.players && this.currentRoom.players.length > 0) {
+      // Defensive fallback for solo mode or sync transitions
+      const fallback = this.currentRoom.players.find((p) => !p.isBot) || this.currentRoom.players[0];
+      if (fallback) {
+        myPlayer = fallback;
+        if (!this.myPlayerId) {
+          this.myPlayerId = fallback.id;
+        }
+      }
+    }
     const isHost = Boolean(this.currentRoom && this.myPlayerId && this.currentRoom.hostId === this.myPlayerId);
 
     return {
@@ -408,6 +418,72 @@ export class BhabhiMultiplayerEngine {
       this.broadcastLocalUpdate(this.currentRoom);
       this.notify();
     }
+  }
+
+  /**
+   * Launch instant Solo vs AI Bots match with 100% deterministic local state
+   */
+  public startSolo(playerName?: string, avatar?: string): void {
+    if (this.botTimer) {
+      clearTimeout(this.botTimer);
+      this.botTimer = null;
+    }
+    // Clean up any pending WS or LAN sessions for isolated, instant local game
+    if (this.ws) {
+      try { this.ws.close(); } catch (e) {}
+      this.ws = null;
+    }
+    this.isConnectedWs = false;
+    this.disconnectLanEvents();
+
+    const code = 'SOLO_' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const hostId = `player_local_${Date.now()}`;
+    const initial = BhabhiEngine.createInitialState(code, hostId, code);
+
+    // Human player (Seat 0)
+    const displayName = (playerName || '').trim() || 'You';
+    const playerAvatar = avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${hostId}`;
+    initial.players.push({
+      id: hostId,
+      name: displayName,
+      avatar: playerAvatar,
+      hand: [],
+      isOut: false,
+      isBot: false,
+      seatIndex: 0,
+      connected: true,
+    });
+
+    // 3 AI Bots (Seats 1, 2, 3)
+    for (let i = 0; i < 3; i++) {
+      const botId = `bot_solo_${i + 1}`;
+      initial.players.push({
+        id: botId,
+        name: BOT_NAMES[i % BOT_NAMES.length],
+        avatar: BOT_AVATARS[i % BOT_AVATARS.length],
+        hand: [],
+        isOut: false,
+        isBot: true,
+        seatIndex: i + 1,
+        connected: true,
+      });
+    }
+
+    // Authoritative start game & card deal (52 cards dealt to 4 players)
+    const started = BhabhiEngine.startGame(initial);
+    if (!started.success) {
+      throw new Error(started.error || 'Failed to initialize cards deal');
+    }
+
+    this.currentRoom = started.state;
+    this.myPlayerId = hostId;
+    this.saveLocalRoom(started.state);
+    this.saveSession();
+    this.notify();
+    bhabhiSounds.playDealCards();
+
+    // Trigger AI bot move if bot holds Ace of Spades
+    this.triggerBotTurnIfNeeded();
   }
 
   /**

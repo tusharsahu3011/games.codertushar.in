@@ -259,19 +259,21 @@ export default function CardHand({
         className="cards-dock-container"
         style={{
           width: '100%',
-          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(10, 15, 28, 0.8) 100%)',
+          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(10, 15, 28, 0.9) 100%)',
           border: '1.5px solid rgba(255, 255, 255, 0.12)',
-          borderRadius: '20px',
-          boxShadow: 'inset 0 2px 12px rgba(255, 255, 255, 0.05), 0 12px 32px rgba(0, 0, 0, 0.6)',
+          borderRadius: '16px',
+          boxShadow: 'inset 0 2px 10px rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.6)',
           backdropFilter: 'blur(12px)',
-          padding: '26px 16px 14px',
+          padding: '10px 14px 6px',
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
           overflowX: 'auto',
           overflowY: 'visible',
           WebkitOverflowScrolling: 'touch',
-          minHeight: '168px',
+          minHeight: '124px',
+          maxHeight: '138px',
+          scrollbarWidth: 'thin',
         }}
       >
         {filteredHand.length === 0 ? (
@@ -281,16 +283,16 @@ export default function CardHand({
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '24px',
+              padding: '16px',
               color: '#94a3b8',
-              fontSize: '0.9rem',
+              fontSize: '0.86rem',
             }}
           >
-            <Sparkles size={26} color="#34d399" style={{ marginBottom: '8px' }} />
-            <span style={{ fontWeight: 800, color: '#34d399', fontSize: '1rem' }}>
+            <Sparkles size={22} color="#34d399" style={{ marginBottom: '6px' }} />
+            <span style={{ fontWeight: 800, color: '#34d399', fontSize: '0.94rem' }}>
               🎉 You have Got Away!
             </span>
-            <span style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '2px' }}>
+            <span style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '2px' }}>
               Hand is cleared! Safe from becoming Bhabhi.
             </span>
           </div>
@@ -315,20 +317,20 @@ export default function CardHand({
 
               // Horizontal overlap calculation to fit cleanly in viewport
               const overlapMargin = N > 14
-                ? '-52px'
-                : N > 11
                 ? '-42px'
+                : N > 11
+                ? '-35px'
                 : N > 8
-                ? '-34px'
+                ? '-28px'
                 : N > 5
-                ? '-24px'
+                ? '-20px'
                 : N > 2
-                ? '-14px'
+                ? '-12px'
                 : '0px';
 
               // Vertical lift on hover or selection (keeping strictly 0deg horizontal rotation)
-              const liftY = isSelected ? -24 : isHovered ? -16 : 0;
-              const scaleFactor = isSelected ? 1.06 : isHovered ? 1.03 : 1;
+              const liftY = isSelected ? -16 : isHovered ? -12 : 0;
+              const scaleFactor = isSelected ? 1.05 : isHovered ? 1.03 : 1;
 
               return (
                 <div
@@ -338,7 +340,7 @@ export default function CardHand({
                     zIndex: isSelected ? 60 : isHovered ? 50 : idx + 10,
                     position: 'relative',
                     transform: `translateY(${liftY}px) scale(${scaleFactor})`,
-                    transition: 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.15s ease',
+                    transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.15s ease',
                   }}
                   onMouseEnter={() => {
                     setHoveredCardId(card.id);
@@ -350,7 +352,7 @@ export default function CardHand({
                 >
                   <PlayingCard
                     card={card}
-                    size="lg"
+                    size="md"
                     isSelected={isSelected}
                     isValidMove={isValid}
                     disabled={!isMyTurn}
@@ -367,16 +369,16 @@ export default function CardHand({
       {/* Helpful bottom cue */}
       <div
         style={{
-          fontSize: '0.75rem',
+          fontSize: '0.72rem',
           color: '#64748b',
-          marginTop: '6px',
+          marginTop: '4px',
           fontWeight: 600,
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '5px',
         }}
       >
-        <ArrowUpCircle size={13} color="#94a3b8" />
+        <ArrowUpCircle size={12} color="#94a3b8" />
         <span>Click card to play into the center table trick</span>
       </div>
     </div>

@@ -147,26 +147,16 @@ export default function BhabhiApp({
     }
   };
 
-  // Launch Solo Match vs AI Bots
-  const handleStartSolo = async () => {
+  // Launch Solo Match vs AI Bots (100% deterministic local state)
+  const handleStartSolo = () => {
     bhabhiSounds.playTap();
-    const pName = ssoUser.displayName || ssoUser.username || 'Player 1';
-    await bhabhiMultiplayer.createRoom(pName, ssoUser.avatar);
-
-    // Add 3 AI Bots for a standard 4-player game
-    bhabhiMultiplayer.addBot();
-    bhabhiMultiplayer.addBot();
-    bhabhiMultiplayer.addBot();
-
-    // Start game immediately
-    setTimeout(() => {
-      try {
-        bhabhiMultiplayer.startGame();
-        setView('active_game');
-      } catch (e: any) {
-        triggerToast(e.message || 'Error starting match');
-      }
-    }, 150);
+    try {
+      const pName = ssoUser.displayName || ssoUser.username || 'You';
+      bhabhiMultiplayer.startSolo(pName, ssoUser.avatar);
+      setView('active_game');
+    } catch (e: any) {
+      triggerToast(e.message || 'Error starting match');
+    }
   };
 
   // Host Online Room
@@ -213,16 +203,23 @@ export default function BhabhiApp({
   };
 
   const room = snapshot.room;
-  const myPlayerId = snapshot.myPlayerId || '';
-  const myPlayer = snapshot.myPlayer;
-  const isHost = snapshot.isHost;
+  const rawPlayerId = snapshot.myPlayerId || '';
+  // Resilient fallback guarantees local player is never null in solo vs AI or room transitions
+  const activePlayer = snapshot.myPlayer ||
+    room?.players.find((p) => p.id === rawPlayerId) ||
+    room?.players.find((p) => !p.isBot) ||
+    room?.players[0] ||
+    null;
+
+  const myPlayerId = activePlayer?.id || rawPlayerId;
+  const isHost = snapshot.isHost || Boolean(room && activePlayer && room.hostId === activePlayer.id);
 
   const isMyTurn = Boolean(
     room &&
     room.status === GameStatus.IN_PROGRESS &&
     room.currentTurnPlayerId === myPlayerId &&
-    myPlayer &&
-    !myPlayer.isOut
+    activePlayer &&
+    !activePlayer.isOut
   );
 
   const prevMyTurnRef = useRef(false);
@@ -240,7 +237,7 @@ export default function BhabhiApp({
       <div
         style={{
           minHeight: '100vh',
-          height: isPlaying ? '100vh' : 'auto',
+          height: isPlaying ? '100dvh' : 'auto',
           width: isPlaying ? '100vw' : 'auto',
           position: isPlaying ? 'fixed' : 'relative',
           inset: isPlaying ? 0 : undefined,
@@ -260,13 +257,15 @@ export default function BhabhiApp({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '12px 20px',
-          background: 'rgba(15, 23, 42, 0.75)',
+          padding: '6px 14px',
+          minHeight: '44px',
+          background: 'rgba(15, 23, 42, 0.85)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           backdropFilter: 'blur(10px)',
-          position: 'sticky',
+          position: isPlaying ? 'relative' : 'sticky',
           top: 0,
           zIndex: 50,
+          flexShrink: 0,
         }}
       >
         {/* Left: Branding & Back Button */}
@@ -541,18 +540,19 @@ export default function BhabhiApp({
               justifyContent: 'space-between',
               flex: 1,
               width: '100%',
-              height: 'calc(100vh - 56px)',
-              padding: '4px 10px 8px',
+              height: 'calc(100dvh - 44px)',
+              padding: '4px 8px 4px',
               overflow: 'hidden',
+              boxSizing: 'border-box',
             }}
           >
-            {/* The Poker Card Table (Opponents + Center Trick + Logs) */}
+            {/* The Poker Card Table (Opponents + Side Dealer + Center Trick + Discard Pile) */}
             <BhabhiTable gameState={room} myPlayerId={myPlayerId} />
 
-            {/* Player's Interactive Hand Tray */}
-            {myPlayer && (
+            {/* Player's Interactive Hand Dock (Anchored, Straight-Line, Zero Cut-Off) */}
+            {activePlayer && (
               <CardHand
-                hand={myPlayer.hand}
+                hand={activePlayer.hand}
                 gameState={room}
                 myPlayerId={myPlayerId}
                 isMyTurn={isMyTurn}
@@ -585,7 +585,7 @@ export default function BhabhiApp({
           onClose={() => setIsChatOpen(false)}
           messages={room.chatMessages || []}
           currentUserId={myPlayerId || ''}
-          currentUserName={myPlayer?.name || 'Player'}
+          currentUserName={activePlayer?.name || 'Player'}
           onSendMessage={(txt) => bhabhiMultiplayer.sendChat(txt)}
           gameThemeColor="#10b981"
         />

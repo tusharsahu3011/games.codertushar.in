@@ -520,108 +520,13 @@ export default function GameGrid({
             Show All Games
           </button>
         </div>
-      ) : currentCategory === 'all' && !searchQuery ? (
-        /* VISUALLY DIVIDED CATEGORIES WHEN BROWSING 'ALL' */
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
-          {/* CATEGORY 1: Live Playable Games */}
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: '16px',
-              }}
-            >
-              <Flame size={20} color="#f59e0b" />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#ffffff', margin: 0 }}>
-                Playable Now • Instant Custom Rooms
-              </h3>
-              <span
-                style={{
-                  fontSize: '0.72rem',
-                  color: '#10b981',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  padding: '2px 8px',
-                  borderRadius: '999px',
-                  fontWeight: 800,
-                }}
-              >
-                LIVE
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
-                gap: '18px',
-              }}
-            >
-              {CATALOG_GAMES.filter((g) => g.status === 'ACTIVE').map((game) => (
-                <GameCard
-                  key={game.id}
-                  game={game}
-                  onPlay={onPlayGame}
-                  onPreview={(g) => setPreviewGame(g)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* CATEGORY 2: Upcoming Games In Development */}
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: '16px',
-              }}
-            >
-              <Sparkles size={20} color="#8b5cf6" />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#ffffff', margin: 0 }}>
-                Coming Soon to Dost Yaar
-              </h3>
-              <span
-                style={{
-                  fontSize: '0.72rem',
-                  color: '#8b5cf6',
-                  background: 'rgba(139, 92, 246, 0.15)',
-                  padding: '2px 8px',
-                  borderRadius: '999px',
-                  fontWeight: 800,
-                }}
-              >
-                IN PROGRESS
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
-                gap: '18px',
-              }}
-            >
-              {CATALOG_GAMES.filter((g) => g.status === 'COMING_SOON').map((game) => (
-                <GameCard
-                  key={game.id}
-                  game={game}
-                  onPlay={onPlayGame}
-                  onPreview={(g) => setPreviewGame(g)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
       ) : (
-        /* STANDARD FILTERED GRID */
+        /* COHESIVE UNIFIED GAME CATALOG GRID */
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
-            gap: '18px',
+            gap: '20px',
           }}
         >
           {filteredGames.map((game) => (

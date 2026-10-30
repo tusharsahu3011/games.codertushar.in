@@ -1,4 +1,4 @@
-import { Play, Users, Clock, ChevronRight, Lock, Sparkles, Eye } from 'lucide-react';
+import { Users, Clock, ChevronRight, Sparkles, Play, Compass, Spade, Radio, Grid, Shield, Crown, Eye, Flame } from 'lucide-react';
 import type { GameItem } from '../../types/hub';
 import { sounds } from '../../games/undercover-game/utils/sound';
 
@@ -8,8 +8,25 @@ export interface GameCardProps {
   onPreview?: (game: GameItem) => void;
 }
 
+// Icon mapping helper for Lucide icons
+function getGameIcon(iconName?: string) {
+  switch (iconName) {
+    case 'Compass': return Compass;
+    case 'Spade': return Spade;
+    case 'Radio': return Radio;
+    case 'Grid': return Grid;
+    case 'Shield': return Shield;
+    case 'Crown': return Crown;
+    case 'Flame': return Flame;
+    case 'Eye':
+    default:
+      return Eye;
+  }
+}
+
 export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
   const isPlayable = game.status === 'ACTIVE';
+  const GameIcon = getGameIcon(game.iconName);
 
   const handleClick = () => {
     if (isPlayable) {
@@ -24,27 +41,34 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
   return (
     <div
       onClick={handleClick}
-      className={isPlayable ? 'card-interactive' : 'card-interactive-subtle'}
+      className="card-interactive"
       style={{
-        padding: 'clamp(20px, 3.5vw, 26px)',
-        borderRadius: '22px',
+        padding: 'clamp(20px, 3.2vw, 26px)',
+        borderRadius: '20px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         background: '#0d131f',
-        border: isPlayable
-          ? `1.5px solid ${game.accentColor}`
-          : '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         cursor: 'pointer',
         position: 'relative',
         transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-        boxShadow: isPlayable
-          ? '0 10px 30px -10px rgba(0, 0, 0, 0.6)'
-          : '0 4px 16px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)',
+        minHeight: '380px',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = game.accentColor;
+        e.currentTarget.style.transform = 'translateY(-3px)';
+        e.currentTarget.style.boxShadow = `0 14px 34px -8px ${game.accentColor}33, 0 8px 24px rgba(0,0,0,0.5)`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.45)';
       }}
     >
       <div>
-        {/* Top Badges & Meta */}
+        {/* Top Badges & Genre */}
         <div
           style={{
             display: 'flex',
@@ -60,39 +84,46 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              fontSize: '0.74rem',
+              fontSize: '0.72rem',
               fontWeight: 800,
               padding: '4px 10px',
               borderRadius: '999px',
-              background: isPlayable ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-              border: isPlayable ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
-              color: isPlayable ? '#10b981' : '#94a3b8',
+              background: isPlayable ? 'rgba(16, 185, 129, 0.15)' : 'rgba(139, 92, 246, 0.15)',
+              border: isPlayable ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(139, 92, 246, 0.35)',
+              color: isPlayable ? '#34d399' : '#c084fc',
               letterSpacing: '0.04em',
             }}
           >
-            <span>{isPlayable ? '● READY TO PLAY' : 'IN DEVELOPMENT'}</span>
+            <span>{isPlayable ? '● READY TO PLAY' : '○ IN DEVELOPMENT'}</span>
           </span>
 
-          <span
+          <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
               fontSize: '0.78rem',
               color: game.accentColor,
               fontWeight: 800,
               letterSpacing: '0.02em',
             }}
           >
-            {game.genre}
-          </span>
+            <GameIcon size={14} />
+            <span>{game.genre}</span>
+          </div>
         </div>
 
         {/* Title & Tagline */}
         <h3
           style={{
-            fontSize: 'clamp(1.4rem, 4vw, 1.7rem)',
+            fontSize: 'clamp(1.35rem, 3.8vw, 1.65rem)',
             fontWeight: 900,
             color: '#ffffff',
             letterSpacing: '-0.02em',
             margin: '0 0 6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
           {game.title}
@@ -100,7 +131,7 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
 
         <div
           style={{
-            fontSize: '0.86rem',
+            fontSize: '0.84rem',
             color: '#94a3b8',
             fontWeight: 600,
             marginBottom: '14px',
@@ -111,56 +142,57 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
 
         <p
           style={{
-            fontSize: '0.92rem',
+            fontSize: '0.88rem',
             color: '#cbd5e1',
             lineHeight: 1.55,
-            margin: '0 0 18px',
+            margin: '0 0 16px',
+            minHeight: '44px',
           }}
         >
           {game.description}
         </p>
 
-        {/* Player range & duration */}
+        {/* Player range & duration metadata */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '14px',
-            padding: '10px 14px',
+            padding: '9px 12px',
             background: 'rgba(255, 255, 255, 0.03)',
             borderRadius: '12px',
             border: '1px solid rgba(255, 255, 255, 0.06)',
-            fontSize: '0.82rem',
+            fontSize: '0.8rem',
             color: '#94a3b8',
-            marginBottom: '18px',
+            marginBottom: '16px',
             flexWrap: 'wrap',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Users size={15} color={game.accentColor} />
+            <Users size={14} color={game.accentColor} />
             <span style={{ color: '#e2e8f0', fontWeight: 700 }}>{game.playerRange}</span>
           </div>
-          <span style={{ opacity: 0.5 }}>•</span>
+          <span style={{ opacity: 0.35 }}>•</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Clock size={15} color={game.accentColor} />
+            <Clock size={14} color={game.accentColor} />
             <span style={{ color: '#e2e8f0', fontWeight: 700 }}>{game.estimatedTime}</span>
           </div>
         </div>
 
-        {/* Features list */}
+        {/* Features Chips */}
         <div
           style={{
             display: 'flex',
             flexWrap: 'wrap',
             gap: '6px',
-            marginBottom: '22px',
+            marginBottom: '20px',
           }}
         >
-          {game.features.map((feat, i) => (
+          {game.features.slice(0, 4).map((feat, i) => (
             <span
               key={i}
               style={{
-                fontSize: '0.74rem',
+                fontSize: '0.72rem',
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 color: '#cbd5e1',
@@ -185,9 +217,9 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
           }}
           style={{
             width: '100%',
-            padding: '13px 20px',
-            minHeight: '48px',
-            fontSize: '0.96rem',
+            padding: '12px 18px',
+            minHeight: '46px',
+            fontSize: '0.92rem',
             fontWeight: 800,
             background: game.accentColor,
             border: 'none',
@@ -197,13 +229,13 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            boxShadow: `0 4px 18px ${game.accentColor}44`,
+            boxShadow: `0 4px 16px ${game.accentColor}44`,
             cursor: 'pointer',
             touchAction: 'manipulation',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.filter = 'brightness(1.1)';
+            e.currentTarget.style.filter = 'brightness(1.12)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
@@ -211,8 +243,9 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
-          <span>Select Mode & Play</span>
-          <ChevronRight size={18} />
+          <Play size={16} fill="#ffffff" />
+          <span>Play Now</span>
+          <ChevronRight size={16} />
         </button>
       ) : (
         <button
@@ -224,11 +257,11 @@ export default function GameCard({ game, onPlay, onPreview }: GameCardProps) {
           style={{
             width: '100%',
             padding: '12px 18px',
-            minHeight: '48px',
+            minHeight: '46px',
             fontSize: '0.88rem',
             background: 'rgba(255, 255, 255, 0.05)',
             border: '1px solid rgba(255, 255, 255, 0.12)',
-            color: '#cbd5e1',
+            color: '#e2e8f0',
             borderRadius: '14px',
             cursor: 'pointer',
             fontWeight: 700,
