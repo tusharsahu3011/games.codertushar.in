@@ -354,57 +354,59 @@ export default function BhabhiApp({
             </div>
           )}
 
-          {/* WebRTC Live Mic Toggle */}
-          <button
-            type="button"
-            onClick={handleToggleMic}
-            title={
-              voiceState.hasPermission
-                ? voiceState.isMuted
-                  ? 'Unmute Microphone'
-                  : 'Mute Microphone'
-                : 'Enable Live Voice Chat'
-            }
-            style={{
-              background: !voiceState.hasPermission
-                ? 'rgba(255, 255, 255, 0.06)'
-                : voiceState.isMuted
-                ? 'rgba(239, 68, 68, 0.15)'
-                : 'rgba(16, 185, 129, 0.18)',
-              border: !voiceState.hasPermission
-                ? '1px solid rgba(255, 255, 255, 0.1)'
-                : voiceState.isMuted
-                ? '1px solid rgba(239, 68, 68, 0.4)'
-                : '1px solid rgba(16, 185, 129, 0.5)',
-              color: !voiceState.hasPermission
-                ? '#94a3b8'
-                : voiceState.isMuted
-                ? '#f87171'
-                : '#34d399',
-              padding: '7px 10px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {voiceState.hasPermission && !voiceState.isMuted ? (
-              <Mic size={15} />
-            ) : (
-              <MicOff size={15} />
-            )}
-            <span className="hide-mobile">
-              {!voiceState.hasPermission
-                ? 'Mic Off'
-                : voiceState.isMuted
-                ? 'Muted'
-                : 'Voice Live'}
-            </span>
-          </button>
+          {/* WebRTC Live Mic Toggle - ONLY IN ONLINE MULTIPLAYER */}
+          {room && !room.isSolo && (
+            <button
+              type="button"
+              onClick={handleToggleMic}
+              title={
+                voiceState.hasPermission
+                  ? voiceState.isMuted
+                    ? 'Unmute Microphone'
+                    : 'Mute Microphone'
+                  : 'Enable Live Voice Chat'
+              }
+              style={{
+                background: !voiceState.hasPermission
+                  ? 'rgba(255, 255, 255, 0.06)'
+                  : voiceState.isMuted
+                  ? 'rgba(239, 68, 68, 0.15)'
+                  : 'rgba(16, 185, 129, 0.18)',
+                border: !voiceState.hasPermission
+                  ? '1px solid rgba(255, 255, 255, 0.1)'
+                  : voiceState.isMuted
+                  ? '1px solid rgba(239, 68, 68, 0.4)'
+                  : '1px solid rgba(16, 185, 129, 0.5)',
+                color: !voiceState.hasPermission
+                  ? '#94a3b8'
+                  : voiceState.isMuted
+                  ? '#f87171'
+                  : '#34d399',
+                padding: '7px 10px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {voiceState.hasPermission && !voiceState.isMuted ? (
+                <Mic size={15} />
+              ) : (
+                <MicOff size={15} />
+              )}
+              <span className="hide-mobile">
+                {!voiceState.hasPermission
+                  ? 'Mic Off'
+                  : voiceState.isMuted
+                  ? 'Muted'
+                  : 'Voice Live'}
+              </span>
+            </button>
+          )}
 
           {/* In-Game Text Chat Button */}
           {room && (
@@ -547,7 +549,7 @@ export default function BhabhiApp({
             }}
           >
             {/* The Poker Card Table (Opponents + Side Dealer + Center Trick + Discard Pile) */}
-            <BhabhiTable gameState={room} myPlayerId={myPlayerId} />
+            <BhabhiTable gameState={room} myPlayerId={myPlayerId} isOnline={!room.isSolo} />
 
             {/* Player's Interactive Hand Dock (Anchored, Straight-Line, Zero Cut-Off) */}
             {activePlayer && (

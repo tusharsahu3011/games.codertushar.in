@@ -5,10 +5,10 @@
   "description": "Fun With Dost Yaar — Social & Party Game Hub with Undercover, Spyfall, Bhabhi, and multiplayer rooms",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "vite --host 0.0.0.0 --port 3011",
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview --host 0.0.0.0",
+    "preview": "vite preview --host 0.0.0.0 --port 3011",
     "server:bhabhi": "node server/bhabhiServer.mjs",
     "start": "node server/bhabhiServer.mjs"
   },

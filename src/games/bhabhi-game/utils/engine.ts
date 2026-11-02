@@ -21,10 +21,10 @@ export const SUIT_SYMBOLS: Record<Suit, string> = {
 };
 
 export const SUIT_COLORS: Record<Suit, string> = {
-  SPADES: '#38bdf8', // crisp sky blue/black accent
-  HEARTS: '#ef4444', // vibrant red
-  CLUBS: '#10b981',  // emerald green
-  DIAMONDS: '#f59e0b', // amber gold
+  SPADES: '#0f172a',
+  HEARTS: '#dc2626',
+  CLUBS: '#0f172a',
+  DIAMONDS: '#dc2626',
 };
 
 export const BOT_NAMES = [

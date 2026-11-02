@@ -70,6 +70,7 @@ export interface ChatMessage {
 export interface GameState {
   gameId: string;
   roomCode?: string;
+  isSolo?: boolean;
   status: GameStatus;
   players: Player[];
   activeTrick: ActiveTrick;

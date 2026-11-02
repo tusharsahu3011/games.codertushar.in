@@ -153,7 +153,7 @@ export default defineConfig({
   plugins: [react(), lanMultiplayerPlugin()],
   server: {
     host: '0.0.0.0',
-    port: 5173,
+    port: 3011,
     strictPort: true,
     cors: true,
     // Enable seamless connections from any LAN IP or mobile device

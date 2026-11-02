@@ -15,9 +15,10 @@ import {
 export interface BhabhiTableProps {
   gameState: GameState;
   myPlayerId: string;
+  isOnline?: boolean;
 }
 
-export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps) {
+export default function BhabhiTable({ gameState, myPlayerId, isOnline = false }: BhabhiTableProps) {
   const [showLogDrawer, setShowLogDrawer] = useState(false);
   const [, setTick] = useState(0);
   const [voiceState, setVoiceState] = useState(() => ({
@@ -340,8 +341,12 @@ export default function BhabhiTable({ gameState, myPlayerId }: BhabhiTableProps)
             position: 'relative',
           }}
         >
-          {/* LEFT FLANK: AI DEALER RIYA WITH HINDI COMMENTARY */}
-          <SideDealer gameState={gameState} myPlayerId={myPlayerId} />
+          {/* LEFT FLANK: AI DEALER RIYA WITH HINDI COMMENTARY - ONLY IN ONLINE MULTIPLAYER */}
+          {isOnline ? (
+            <SideDealer gameState={gameState} myPlayerId={myPlayerId} />
+          ) : (
+            <div style={{ width: 'clamp(110px, 14vw, 150px)', flexShrink: 0 }} />
+          )}
 
           {/* CENTER: ACTIVE TRICK CARD TABLE */}
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>

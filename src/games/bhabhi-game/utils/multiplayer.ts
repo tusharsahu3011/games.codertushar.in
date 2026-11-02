@@ -439,6 +439,7 @@ export class BhabhiMultiplayerEngine {
     const code = 'SOLO_' + Math.random().toString(36).substring(2, 6).toUpperCase();
     const hostId = `player_local_${Date.now()}`;
     const initial = BhabhiEngine.createInitialState(code, hostId, code);
+    initial.isSolo = true;
 
     // Human player (Seat 0)
     const displayName = (playerName || '').trim() || 'You';
